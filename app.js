@@ -9,6 +9,8 @@ const API = "/api/v1";
 
 const app = express();
 
+// GIT DEMO
+
 // izmantojam middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
