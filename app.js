@@ -1,6 +1,8 @@
 import express from "express";
 import favicon from "serve-favicon";
 import path from "path";
+import xlsx from "xlsx";
+import fs from "fs";
 
 // definējam pāris mainīgos
 const __dirname = path.resolve();
@@ -8,6 +10,34 @@ const PORT = 3000;
 const API = "/api/v1";
 
 const app = express();
+
+const url = "https://siguldaspv.edu.lv/wp-content/uploads/2023/02/stundu_saraksts__6_02_23.xlsx";
+
+if (!fs.existsSync("stundu_saraksts.xlsx")) {
+    console.log("stundu saraksts netika atrasts, lejupielādējam jaunu")
+    // lejupielādē stundu sarakstu un saglabā kā failu
+    fetch(url).then(async (res) => {
+        const blob = await res.blob();
+        console.log(blob);
+        const buffer = Buffer.from(await blob.arrayBuffer());
+        fs.writeFileSync("stundu_saraksts.xlsx", buffer);
+    });
+}
+
+const workbook = xlsx.readFile("stundu_saraksts.xlsx");
+let worksheet = undefined;
+
+// worksheet = workbook.Sheets["Ind. un grupu nod. 5_I"];
+// worksheet["!ref"] = "A3:E20";
+
+worksheet = workbook.Sheets["10_12klase_16_01_2023"];
+worksheet["!ref"] = "A2:AB16";//A2:AB64
+
+const data = xlsx.utils.sheet_to_json(worksheet);
+
+console.log(data);
+
+
 
 // GIT DEMO
 
