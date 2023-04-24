@@ -26,20 +26,70 @@ if (!fs.existsSync("stundu_saraksts.xlsx")) {
 
 const workbook = xlsx.readFile("stundu_saraksts.xlsx");
 let worksheet = undefined;
-
-// worksheet = workbook.Sheets["Ind. un grupu nod. 5_I"];
-// worksheet["!ref"] = "A3:E20";
-
 worksheet = workbook.Sheets["10_12klase_16_01_2023"];
-worksheet["!ref"] = "A2:AB16";//A2:AB64
+worksheet["!ref"] = "A2:Q52";
+const desmit_lidz_divpadsmit_klases = xlsx.utils.sheet_to_html(worksheet);
+worksheet = workbook.Sheets["1.-4.kl_16_01_2023"];
+const viens_lidz_cetri_klases = xlsx.utils.sheet_to_html(worksheet);
+const days = 5;
+const offsets = {
+    "worksheets": ["1.-4.kl_16_01_2023", "4_6_klase_6_02_2023", "7.-9._6_02_2023", "10_12klase_16_01_2023"],
+    "klase": ["E2", "G2", "I2", "J2", "K2", "M2", "O2", "P2", "Q2", "R2", "T2", "V2", "W2"],
+    "1.a": "E3:E12",
+    "1.b": "G3:G12",
+    "1.c": "I3:I12",
+    "1.s": "J3:J12",
+    "2.a": "K3:K12",
+    "2.b": "M3:M12",
+    "2.c": "O3:O12",
+    "2.s-1": "P3:P12",
+    "2.s-2": "Q3:Q12",
+    "3.a": "R3:R12",
+    "3.b": "T3:T12",
+    "3.c": "V3:V12",
+    "3.s": "W3:W12"
+};
+const saraksts = {
+    "1.a": [],
+    "1.b": [],
+    "1.c": [],
+    "1.s": [],
+    "2.a": [],
+    "2.b": [],
+    "2.c": [],
+    "2.s-1": [],
+    "2.s-2": [],
+    "3.a": [],
+    "3.b": [],
+    "3.c": [],
+    "3.s": []
+};
+offsets.klase.forEach(klase_offset => {
+    for (let day = 0; day < days; day++) {
+        worksheet = workbook.Sheets[offsets.worksheets[0]];
+        const klase = worksheet[klase_offset].v;
+        console.log("klase: ", klase);
+        let stundu_offset = offsets[klase];
+        // stundu_offset = stundu_offset.split(":");
+        // stundu_offset.forEach(item => console.log(item.split(/[A-Z]/)));
+        const start_offset = Number.parseInt(stundu_offset.match(/\d/)[0]) + 10 * day;
+        const end_offset = Number.parseInt(stundu_offset.match(/\d\d/)[0]) + 10 * day;
+        stundu_offset = stundu_offset.replace(/\d\d/, end_offset);
+        stundu_offset = stundu_offset.replace(/\d/, start_offset);
+        console.log("start", start_offset, "end", end_offset);
+        console.log("offset: ", stundu_offset);
+        worksheet["!ref"] = stundu_offset;
+        const stundas = xlsx.utils.sheet_to_json(worksheet);
+        console.log(stundas);
+        const diena = { diena: day, stundas: [] }
+        stundas.forEach((obj) => {
+            diena.stundas.push(obj["__EMPTY"]);
+        });
+        saraksts[klase].push(diena);
+    }
+});
 
-const data = xlsx.utils.sheet_to_json(worksheet);
-
-console.log(data);
-
-
-
-// GIT DEMO
+console.log("stundu saraksts", saraksts);
 
 // izmantojam middleware
 app.use(express.json());
@@ -53,6 +103,14 @@ app.get("/", (req, res) => {
 
 app.get("/konsultacijas", (req, res) => {
     res.redirect("https://siguldaspv.edu.lv/wp-content/uploads/2023/02/Kons_graf_2_sem_22_23.pdf");
+});
+
+app.get("/1lidz4", (req, res) => {
+    res.status(200).send(viens_lidz_cetri_klases);
+});
+
+app.get("/10lidz12", (req, res) => {
+    res.status(200).send(desmit_lidz_divpadsmit_klases);
 });
 
 // startējam serveri
