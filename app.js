@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/konsultacijas", (req, res) => {
-    res.redirect("https://siguldaspv.edu.lv/wp-content/uploads/2023/02/Kons_graf_2_sem_22_23.pdf");
+    res.status(200).sendFile(path.join(__dirname, "public/konsultacijas/konsultacijas.html"));
 });
 
 // startējam serveri
