@@ -62,7 +62,7 @@ const offsets = [
         "4.c": "L3:N14",
         "4.s": "P3:R14",
         "5.a": "T3:V14",
-        "5.b": "X3:z14",
+        "5.b": "X3:Z14",
         "5.c": "AB3:AD14",
         "5.s": "AF3:AH14",
         "6.a": "AJ3:AL14",
@@ -94,8 +94,15 @@ offsets[0].klase.forEach(klase_offset => {
         const stundas = xlsx.utils.sheet_to_json(worksheet);
         console.log(stundas);
         const diena = { diena: day, stundas: [] }
-        stundas.forEach((obj) => {
-            diena.stundas.push(obj["__EMPTY"]);
+        stundas.forEach((stunda, i) => {
+            const v = Object.values(stunda);
+            const s = {
+                numurs: i + 1,
+                divi: false,
+                nosaukums: v[0],
+                kabinets: v[1]
+            };
+            diena.stundas.push(s);
         });
         saraksts[klase].push(diena);
     }
@@ -136,14 +143,42 @@ offsets[1].klase.forEach(klase_offset => {
         const stundas = xlsx.utils.sheet_to_json(worksheet);
         console.log(stundas);
         const diena = { diena: day, stundas: [] }
-        stundas.forEach((obj) => {
-            diena.stundas.push(obj["__EMPTY"]);
+        let n = 1;
+        stundas.forEach((stunda, i) => {
+            if (i === 1 || i === 2) {
+                return;
+            }
+
+            const s = {
+                numurs: n,
+                divi: false,
+                nosaukums: undefined,
+                kabinets: undefined,
+            };
+            const v = Object.values(stunda);
+            if (v.length === 3) {
+                s.divi = true;
+                s.nosaukums = v[0];
+                s.nosaukums2 = v[1];
+                const kabineti = v[2].split("/");
+                s.kabinets = kabineti[0];
+                s.kabinets2 = kabineti[1];
+                diena.stundas.push(s);
+                n += 1;
+                return;
+            }
+
+            s.nosaukums = v[0];
+            s.kabinets = v[1];
+
+            diena.stundas.push(s);
+            n += 1;
         });
         saraksts[klase].push(diena);
     }
 });
 
-console.log("stundu saraksts", saraksts);
+console.log("stundu saraksts", saraksts["4.a"][0]);
 
 // izmantojam middleware
 app.use(express.json());
