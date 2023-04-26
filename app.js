@@ -32,23 +32,27 @@ const desmit_lidz_divpadsmit_klases = xlsx.utils.sheet_to_html(worksheet);
 worksheet = workbook.Sheets["1.-4.kl_16_01_2023"];
 const viens_lidz_cetri_klases = xlsx.utils.sheet_to_html(worksheet);
 const days = 5;
-const offsets = {
-    "worksheets": ["1.-4.kl_16_01_2023", "4_6_klase_6_02_2023", "7.-9._6_02_2023", "10_12klase_16_01_2023"],
-    "klase": ["E2", "G2", "I2", "J2", "K2", "M2", "O2", "P2", "Q2", "R2", "T2", "V2", "W2"],
-    "1.a": "E3:E12",
-    "1.b": "G3:G12",
-    "1.c": "I3:I12",
-    "1.s": "J3:J12",
-    "2.a": "K3:K12",
-    "2.b": "M3:M12",
-    "2.c": "O3:O12",
-    "2.s-1": "P3:P12",
-    "2.s-2": "Q3:Q12",
-    "3.a": "R3:R12",
-    "3.b": "T3:T12",
-    "3.c": "V3:V12",
-    "3.s": "W3:W12"
-};
+// worksheets "1.-4.kl_16_01_2023", "4_6_klase_6_02_2023", "7.-9._6_02_2023", "10_12klase_16_01_2023"
+const offsets = [
+    {
+        "worksheet": "1.-4.kl_16_01_2023",
+        "irVirzieni": false,
+        "klase": ["E2", "G2", "I2", "J2", "K2", "M2", "O2", "P2", "Q2", "R2", "T2", "V2", "W2"],
+        "1.a": "E3:E12",
+        "1.b": "G3:G12",
+        "1.c": "I3:I12",
+        "1.s": "J3:J12",
+        "2.a": "K3:K12",
+        "2.b": "M3:M12",
+        "2.c": "O3:O12",
+        "2.s-1": "P3:P12",
+        "2.s-2": "Q3:Q12",
+        "3.a": "R3:R12",
+        "3.b": "T3:T12",
+        "3.c": "V3:V12",
+        "3.s": "W3:W12"
+    }
+];
 const saraksts = {
     "1.a": [],
     "1.b": [],
@@ -64,12 +68,13 @@ const saraksts = {
     "3.c": [],
     "3.s": []
 };
-offsets.klase.forEach(klase_offset => {
+offsets[0].klase.forEach(klase_offset => {
+    // create new thing in saraksts object
     for (let day = 0; day < days; day++) {
-        worksheet = workbook.Sheets[offsets.worksheets[0]];
+        worksheet = workbook.Sheets[offsets[0].worksheet];
         const klase = worksheet[klase_offset].v;
         console.log("klase: ", klase);
-        let stundu_offset = offsets[klase];
+        let stundu_offset = offsets[0][klase];
         // stundu_offset = stundu_offset.split(":");
         // stundu_offset.forEach(item => console.log(item.split(/[A-Z]/)));
         const start_offset = Number.parseInt(stundu_offset.match(/\d/)[0]) + 10 * day;
