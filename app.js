@@ -28,30 +28,4 @@ app.get("/konsultacijas", (req, res) => {
 // startējam serveri
 app.listen(PORT, () => {
     console.log(`server started on http://localhost:${PORT}`);
-}); 
-
-
-
-// Datu nolasīšana
-
-const url = "https://onedrive.live.com/embed?resid=C39F579EE1333DFC%212112358&authkey=%21AFhpEl_KYccQa7c&em=2&wdAllowInteractivity=False&Item=%27Lapa1%27!A1%3AE98&wdHideGridlines=True&wdInConfigurator=True&wdHideHeaders=True&wdInConfigurator=True&wdHideSheetTabs=True";
-const table = document.createElement("table");
-document.body.appendChild(table);
-
-fetch(url)
-  .then(response => response.text())
-  .then(html => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-    const dataRows = doc.querySelectorAll("table tbody tr");
-    dataRows.forEach(row => {
-      const cells = row.querySelectorAll("td");
-      const tableRow = document.createElement("tr");
-      cells.forEach(cell => {
-        const tableCell = document.createElement("td");
-        tableCell.textContent = cell.textContent;
-        tableRow.appendChild(tableCell);
-      });
-      table.appendChild(tableRow);
-    });
-  });
+});
