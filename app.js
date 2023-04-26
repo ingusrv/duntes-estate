@@ -316,4 +316,4 @@ app.get("/10lidz12", (req, res) => {
 // startējam serveri
 app.listen(PORT, () => {
     console.log(`server started on http://localhost:${PORT}`);
-}); 
+});

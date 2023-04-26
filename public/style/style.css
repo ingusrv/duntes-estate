@@ -1,0 +1,45 @@
+a {
+    font-family: sans-serif;
+    
+}
+
+label {
+    font-family: sans-serif;
+    align-items: center;
+    color: white;
+    text-align: center;
+    font-size: 45px;
+
+}
+
+option { 
+    align-items: center;
+    text-align: center;
+    font-size: 30px;
+}
+
+th {
+    color: white;
+    text-align: center;
+    align-items: center;
+}
+
+nav-link :hover {
+    background-color: black; 
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 13%;
+  }
+
+  .nav-link :hover { 
+    background-color: red;
+  }
+
+  .nav-link :hover { 
+    background-color: red;
+  }
+
