@@ -25,12 +25,13 @@ if (!fs.existsSync("stundu_saraksts.xlsx")) {
 }
 
 const workbook = xlsx.readFile("stundu_saraksts.xlsx");
+
+
+const desmit_lidz_divpadsmit_klases = xlsx.utils.sheet_to_html(workbook.Sheets["10_12klase_16_01_2023"]);
+const viens_lidz_cetri_klases = xlsx.utils.sheet_to_html(workbook.Sheets["1.-4.kl_16_01_2023"]);
+const cetri_lidz_sesi_klases = xlsx.utils.sheet_to_html(workbook.Sheets["4_6_klase_6_02_2023"]);
+
 let worksheet = undefined;
-worksheet = workbook.Sheets["10_12klase_16_01_2023"];
-worksheet["!ref"] = "A2:Q52";
-const desmit_lidz_divpadsmit_klases = xlsx.utils.sheet_to_html(worksheet);
-worksheet = workbook.Sheets["1.-4.kl_16_01_2023"];
-const viens_lidz_cetri_klases = xlsx.utils.sheet_to_html(worksheet);
 const days = 5;
 // worksheets "1.-4.kl_16_01_2023", "4_6_klase_6_02_2023", "7.-9._6_02_2023", "10_12klase_16_01_2023"
 const offsets = [
@@ -51,34 +52,82 @@ const offsets = [
         "3.b": "T3:T12",
         "3.c": "V3:V12",
         "3.s": "W3:W12"
+    },
+    {
+        "worksheet": "4_6_klase_6_02_2023",
+        "irVirzieni": false,
+        "klase": ["D2", "H2", "L2", "P2", "T2", "X2", "AB2", "AF2", "AJ2", "AN2", "AR2", "AV2"],
+        "4.a": "D3:F14",
+        "4.b": "H3:J14",
+        "4.c": "L3:N14",
+        "4.s": "P3:R14",
+        "5.a": "T3:V14",
+        "5.b": "X3:z14",
+        "5.c": "AB3:AD14",
+        "5.s": "AF3:AH14",
+        "6.a": "AJ3:AL14",
+        "6.b": "AN3:AP14",
+        "6.c": "AR3:AT14",
+        "6.s": "AV3:AX14"
     }
 ];
-const saraksts = {
-    "1.a": [],
-    "1.b": [],
-    "1.c": [],
-    "1.s": [],
-    "2.a": [],
-    "2.b": [],
-    "2.c": [],
-    "2.s-1": [],
-    "2.s-2": [],
-    "3.a": [],
-    "3.b": [],
-    "3.c": [],
-    "3.s": []
-};
+
+const saraksts = {};
+
+// TODO: apvienot visu vienā
+// 1. līdz 3. klase
 offsets[0].klase.forEach(klase_offset => {
-    // create new thing in saraksts object
+    worksheet = workbook.Sheets[offsets[0].worksheet];
+    const klase = worksheet[klase_offset].v;
+    console.log("klase: ", klase);
+    saraksts[klase] = [];
+
     for (let day = 0; day < days; day++) {
-        worksheet = workbook.Sheets[offsets[0].worksheet];
-        const klase = worksheet[klase_offset].v;
-        console.log("klase: ", klase);
         let stundu_offset = offsets[0][klase];
-        // stundu_offset = stundu_offset.split(":");
-        // stundu_offset.forEach(item => console.log(item.split(/[A-Z]/)));
         const start_offset = Number.parseInt(stundu_offset.match(/\d/)[0]) + 10 * day;
         const end_offset = Number.parseInt(stundu_offset.match(/\d\d/)[0]) + 10 * day;
+        stundu_offset = stundu_offset.replace(/\d\d/, end_offset);
+        stundu_offset = stundu_offset.replace(/\d/, start_offset);
+        console.log("start", start_offset, "end", end_offset);
+        console.log("offset: ", stundu_offset);
+        worksheet["!ref"] = stundu_offset;
+        const stundas = xlsx.utils.sheet_to_json(worksheet);
+        console.log(stundas);
+        const diena = { diena: day, stundas: [] }
+        stundas.forEach((obj) => {
+            diena.stundas.push(obj["__EMPTY"]);
+        });
+        saraksts[klase].push(diena);
+    }
+});
+
+// 4. līdz 6. klase
+offsets[1].klase.forEach(klase_offset => {
+    worksheet = workbook.Sheets[offsets[1].worksheet];
+    const klase = worksheet[klase_offset].v.match(/\d.\w/)[0];
+    console.log("klase: ", klase);
+    saraksts[klase] = [];
+
+    for (let day = 0; day < days; day++) {
+        let stundu_offset = offsets[1][klase];
+        let start_offset = Number.parseInt(stundu_offset.match(/\d/)[0]) + 10 * day + 1;
+        let end_offset = Number.parseInt(stundu_offset.match(/\d\d/)[0]) + 10 * day + 1;
+        // RODO: izņemt šo
+        if (day === 0) {
+            start_offset -= 1;
+            end_offset -= 1;
+        }
+        if (day === 1) {
+            end_offset -= 1;
+        }
+        if (day === 3) {
+            start_offset += 1;
+            end_offset += 1;
+        }
+        if (day === 4) {
+            start_offset += 2;
+            end_offset += 2;
+        }
         stundu_offset = stundu_offset.replace(/\d\d/, end_offset);
         stundu_offset = stundu_offset.replace(/\d/, start_offset);
         console.log("start", start_offset, "end", end_offset);
@@ -112,6 +161,10 @@ app.get("/konsultacijas", (req, res) => {
 
 app.get("/1lidz4", (req, res) => {
     res.status(200).send(viens_lidz_cetri_klases);
+});
+
+app.get("/4lidz6", (req, res) => {
+    res.status(200).send(cetri_lidz_sesi_klases);
 });
 
 app.get("/10lidz12", (req, res) => {
