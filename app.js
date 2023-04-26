@@ -276,7 +276,25 @@ app.use(favicon(path.join(__dirname, "public/favicon.ico")));
 
 // sūtam index.html kad lietotājs nonāk galvenajā lapā
 app.get("/", (req, res) => {
+    res.redirect("/index/");
+});
+
+// jādara šis lai apietu problēmu, ka javascript nelādējas
+app.get("/index/", (req, res) => {
     res.status(200).sendFile(path.join(__dirname, "public/index/index.html"));
+});
+
+app.get("/api/v1/stundas", (req, res) => {
+    console.log(req.query);
+    const klase = req.query.klase;
+    const virziens = req.query.virziens;
+
+    const stundas = saraksts[klase];
+    if (stundas === undefined) {
+        res.status(404).json({ message: "nepareiza klase" });
+    }
+
+    res.status(200).json(stundas);
 });
 
 app.get("/konsultacijas", (req, res) => {
